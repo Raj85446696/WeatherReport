@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Report</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+</head>
+
+<body>
+    <img src="https://img.freepik.com/free-photo/woman-catching-flying-umbrella_171337-15385.jpg?t=st=1732693168~exp=1732696768~hmac=3020f7be67b53810fd9aaf80ec8f0bb1a26fc465b812d21e07482d793098a269&w=1380" alt="image">
+
+    <div class="content">
+        <div class="search">
+            <input type="search" name="search" id="search" spellcheck="false" placeholder="Enter city name">
+            <button onclick="checkWeather()"><i class="ri-search-line"></i></button>
+        </div>
+
+        <div class="weather">
+            <img id="weather-icon" src="https://static.vecteezy.com/system/resources/previews/012/066/505/original/sunny-and-rainy-day-weather-forecast-icon-meteorological-sign-3d-render-png.png" alt="weather">
+            <h1 id="temp" class="temp">22°C</h1>
+            <h2 id="city" class="city">Delhi</h2>
+
+            <div class="details">
+                <div class="col">
+                    <i class="ri-water-percent-line"></i>
+                    <div>
+                        <p id="humidity" class="humidity">50%</p>
+                        <h3>Humidity</h3>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <i class="ri-windy-line"></i>
+                    <div>
+                        <p id="wind" class="wind">15 km/h</p>
+                        <h3>Wind</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "1c5afd6e1db61f0b28ed6473b78a3c2b";
+
+        // Function to check the weather based on city name
+        async function checkWeather() {
+            const city = document.getElementById('search').value.trim();
+            
+            // Check if the input field is empty
+            if (!city) {
+                alert("Please enter a city name");
+                return;
+            }
+
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+
+            try {
+                const res = await fetch(apiUrl);
+
+                // If the API response is unsuccessful (e.g. city not found)
+                if (!res.ok) {
+                    throw new Error('City not found');
+                }
+
+                const data = await res.json();
+
+                // Check if the API returns valid data
+                if (data.cod === 200) {
+                    document.getElementById('temp').textContent = `${data.main.temp}°C`;
+                    document.getElementById('city').textContent = data.name;
+                    document.getElementById('humidity').textContent = `${data.main.humidity}%`;
+                    document.getElementById('wind').textContent = `${data.wind.speed} km/h`;
+
+                    // Update weather icon based on weather conditions
+                    const weatherIcon = document.getElementById('weather-icon');
+                    const weatherCondition = data.weather[0].main.toLowerCase();
+
+                    if (weatherCondition === "clear") {
+                        weatherIcon.src = "https://openweathermap.org/img/wn/01d.png";  // Clear weather icon
+                    } else if (weatherCondition === "rain") {
+                        weatherIcon.src = "https://openweathermap.org/img/wn/10d.png";  // Rainy weather icon
+                    } else if (weatherCondition === "clouds") {
+                        weatherIcon.src = "https://openweathermap.org/img/wn/03d.png";  // Cloudy weather icon
+                    } else {
+                        weatherIcon.src = "https://openweathermap.org/img/wn/04d.png";  // Default weather icon
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching the weather data:', error);
+                alert(error.message || 'An error occurred while fetching weather data.');
+            }
+        }
+    </script>
+</body>
+
+</html>
